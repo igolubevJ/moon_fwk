@@ -1,5 +1,6 @@
 
 
-export function withoutNulls(children) {
-  throw new Error('[withoutNulls] not implemented')
+export function withoutNulls(arr) {
+  // Используем != для удаление null и undefined
+  return arr.filter((item) => item != null)
 }

@@ -16,6 +16,9 @@ export const DOM_TYPES = {
   FRAGMENT: 'fragment',     // тип для узла фрагмента
 }
 
+/// Функция возвращает объекты виртуального узла с переданным
+/// именем тега, свойствами и дочерними узлами, а также со
+/// свойством type. 
 export function h(tag, props = {}, children = []) {
   return {
     tag,
@@ -26,5 +29,11 @@ export function h(tag, props = {}, children = []) {
 }
 
 function mapTextNodes(children) {
-  throw new Error('[mapTextNodes] not implemented')
+  return children.map((child) => 
+    typeof child === 'string' ? hString(child) : child
+  )
+}
+
+function hString(child) {
+  throw new Error('[hString] not implemented')
 }
