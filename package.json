@@ -1,0 +1,16 @@
+{
+  "name": "moon_fwk",
+  "version": "1.0.0",
+  "description": "A project to learn how to write a frontend framework",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/runtime"
+  ],
+  "scripts": {
+    "serve:examples": "npx http-server . -o ./examples/"
+  },
+  "keywords": [],
+  "author": "IGolubev",
+  "license": "ISC"
+}
