@@ -1,0 +1,15 @@
+{
+  "name": "moon_fwk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/moon_fwk.js",
+  "files": [
+    "dist/moon_fwk.js"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "IGolubev",
+  "license": "ISC"
+}
