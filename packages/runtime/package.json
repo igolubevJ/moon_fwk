@@ -7,9 +7,15 @@
     "dist/moon_fwk.js"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepack": "npm run build",
+    "build": "rollup -c"
   },
   "keywords": [],
   "author": "IGolubev",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^4.40.0",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-filesize": "^10.0.0"
+  }
 }
