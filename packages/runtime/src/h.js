@@ -1,3 +1,5 @@
+import { withoutNulls } from './utils/array'
+
 /*
 
 Три типа узла:
@@ -12,4 +14,17 @@ export const DOM_TYPES = {
   TEXT: 'text',             // тип для текстового узла
   ELEMENT: 'element',       // тип для узла элемента
   FRAGMENT: 'fragment',     // тип для узла фрагмента
+}
+
+export function h(tag, props = {}, children = []) {
+  return {
+    tag,
+    props,
+    children: mapTextNodes(withoutNulls(children)),
+    type: DOM_TYPES.ELEMENT,
+  }
+}
+
+function mapTextNodes(children) {
+  throw new Error('[mapTextNodes] not implemented')
 }
