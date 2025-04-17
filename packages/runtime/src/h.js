@@ -39,6 +39,15 @@ export function hString(str) {
   }
 }
 
+/// Функция для создания виртуальных узлов фрагментов.
+/// Фрагмент представляет собой массив дочерних узлов. 
+export function hFragment(vNodes) {
+  return {
+    value: mapTextNodes(withoutNulls(vNodes)),
+    children: DOM_TYPES.FRAGMENT,
+  }
+}
+
 
 function mapTextNodes(children) {
   return children.map((child) => 
