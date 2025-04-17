@@ -26,8 +26,16 @@ export function mountDOM(vdom, parentEl) {
   }
 }
 
+/// После создания текстового DOM-узла нужно выполнить две операции:
+/// 1. Сохранить ссылку на реальный DOM узел в свойстве el виртуального узла
+/// 2. Присоединить текстовый узел к родительскому элементу.
 function createTextNode(vdom, parentEl) {
-  throw new Error('[createTextNode] not implemented')
+  const { value } = vdom
+
+  const textNode = document.createTextNode(value) // Создает текстовый узел
+  vdom.el = textNode                              // Сохраняет ссылку на узел
+
+  parentEl.append(textNode)                       // Присоединяет к родительскому элементу
 }
 
 function createElementNode(vdom, parentEl) {
