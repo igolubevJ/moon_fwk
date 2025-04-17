@@ -28,12 +28,20 @@ export function h(tag, props = {}, children = []) {
   }
 }
 
+/// Функция возвращает объект текстового узла. 
+/// Текстовый виртуальный узел представляет собой обычный объект, 
+/// у которого свойство type присвоено значение DOM_TYPES.TEXT, 
+/// а свойству value присвоено текстовое содержимое.
+export function hString(str) {
+  return {
+    value: str,
+    type: DOM_TYPES.TEXT,
+  }
+}
+
+
 function mapTextNodes(children) {
   return children.map((child) => 
     typeof child === 'string' ? hString(child) : child
   )
-}
-
-function hString(child) {
-  throw new Error('[hString] not implemented')
 }
