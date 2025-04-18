@@ -2,6 +2,18 @@ export class Dispatcher {
   #subs = new Map()
   #afterHandlers = []
 
+  dispatch(commandName, payload) {
+    if (this.#subs.has(commandName)) {
+      // Проверяет что обработчики зарегистрированы и вызывает их
+      this.#subs.get(commandName).forEach((handler) => handler(payload))
+    } else {
+      console.warn(`No handlers for command: ${commandName}`)
+    }
+
+    // Выполняет послекомандные обработки
+    this.#afterHandlers.forEach((handler) => handler())
+  }
+
   subscribe(commandName, handler) {
     if (!this.#subs.has(commandName)) {
       // Создать массив подписок для заданного имени команды,
