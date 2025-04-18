@@ -40,6 +40,12 @@ export function createApp({ state, view, reducers = {} }) {
     mount(_parentEl) {        // метод для монтирования приложения в DOM
       parentEl = _parentEl
       renderApp()
+    },
+
+    unmount() {               // метод для демонтирования приложения из DOM
+      destroyDOM(vdom)
+      vdom = null
+      subscriptions.forEach((unsubscribe) => unsubscribe())
     }
   }
 }
