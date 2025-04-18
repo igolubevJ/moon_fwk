@@ -38,10 +38,19 @@ function createTextNode(vdom, parentEl) {
   parentEl.append(textNode)                       // Присоединяет к родительскому элементу
 }
 
+
+/// Фрагменты не являются узлами, которые присоединяются к DOM 
+/// они представляют массивы дочерних узлов. По этой причине свойство 
+/// el виртуального узла фрагмента должно указывать на родительский 
+/// элемент, к которому присоединяются дочернии узлы фрагмента.   
+function createFragmentNode(vdom, parentEl) {
+  const { children } = vdom
+  vdom.el = parentEl                                     // Сохранение ссылки на родительский элемент
+  children.forEach((child) => mountDOM(child, parentEl)) // Присоединяет каждый дочерний узел к родительскому элементу
+}
+
 function createElementNode(vdom, parentEl) {
   throw new Error('[createElementNode] not implemented')
 }
 
-function createFragmentNode(vdom, parentEl) {
-  throw new Error('[createFragmentNode] not implemented')
-}
+
