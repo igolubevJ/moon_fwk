@@ -1,5 +1,6 @@
 import { h } from './h'
 import { mountDOM } from './mount-dom'
+import { destroyDOM } from './destroy-dom'
 
 const vdom = h('main', {}, [
   h('section', {}, [
@@ -18,3 +19,7 @@ const vdom = h('main', {}, [
 console.log(vdom)
 
 mountDOM(vdom, document.body)
+
+setTimeout(() => {
+  destroyDOM(vdom)
+}, 10000)

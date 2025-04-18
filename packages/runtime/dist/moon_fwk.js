@@ -79,6 +79,11 @@ function addEventListeners(listeners = {}, el) {
   });
   return addedListeners
 }
+function removeEventListeners(listeners, el) {
+  Object.entries(listeners).forEach(([eventName, handler]) => {
+    el.removeEventListener(eventName, handler);
+  });
+}
 
 function mountDOM(vdom, parentEl) {
   switch(vdom.type) {
@@ -124,6 +129,45 @@ function addProps(el, props, vdom) {
   setAttributes(el, attrs);
 }
 
+function destroyDOM(vdom) {
+  const { type } = vdom;
+  switch (type) {
+    case DOM_TYPES.TEXT: {
+      removeTextNode(vdom);
+      break
+    }
+    case DOM_TYPES.ELEMENT: {
+      removeElementNode(vdom);
+      break
+    }
+    case DOM_TYPES.FRAGMENT: {
+      removeFragmentNodes(vdom);
+      break
+    }
+    default: {
+      throw new Error(`Can't destroy DOM of type: ${type}`)
+    }
+  }
+  delete vdom.el;
+}
+function removeTextNode(vdom) {
+  const { el } = vdom;
+  el.remove();
+}
+function removeElementNode(vdom) {
+  const { el, children, listeners } = vdom;
+  el.remove();
+  children.forEach(destroyDOM);
+  if (listeners) {
+    removeEventListeners(listeners, el);
+    delete vdom.listeners;
+  }
+}
+function removeFragmentNodes(vdom) {
+  const { children } = vdom;
+  children.forEach(destroyDOM);
+}
+
 const vdom = h('main', {}, [
   h('section', {}, [
     h('h1', {}, ['My Blog']),
@@ -139,3 +183,6 @@ const vdom = h('main', {}, [
 ]);
 console.log(vdom);
 mountDOM(vdom, document.body);
+setTimeout(() => {
+  destroyDOM(vdom);
+}, 10000);

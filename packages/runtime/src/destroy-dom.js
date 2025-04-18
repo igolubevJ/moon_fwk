@@ -54,6 +54,7 @@ function removeElementNode(vdom) {
   }
 }
 
-function removeFragmentNodes() {
-  throw new Error('[removeFragmentNodes] not implemented')
+function removeFragmentNodes(vdom) {
+  const { children } = vdom
+  children.forEach(destroyDOM)
 }
