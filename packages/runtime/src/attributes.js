@@ -29,7 +29,11 @@ function setClass(el, className) {
 }
 
 function setStyle(el, prop, value) {
-  throw new Error('[setStyle] not implemented')
+  el.style[prop] = value
+}
+
+function removeStyle(el, prop) {
+  el.style[prop] = null
 }
 
 function setAttribute(el, name, value) {
