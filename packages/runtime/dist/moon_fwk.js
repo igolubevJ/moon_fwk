@@ -21,10 +21,107 @@ function hString(str) {
     type: DOM_TYPES.TEXT,
   }
 }
+function hFragment(vNodes) {
+  return {
+    value: mapTextNodes(withoutNulls(vNodes)),
+    children: DOM_TYPES.FRAGMENT,
+  }
+}
 function mapTextNodes(children) {
   return children.map((child) =>
     typeof child === 'string' ? hString(child) : child
   )
+}
+
+function addEventListener(eventName, handler, el) {
+  el.addEventListener(eventName, handler);
+  return handler
+}
+function addEventListeners(listeners = {}, el) {
+  const addedListeners = {};
+  Object.entries(listeners).forEach(([eventName, handler]) => {
+    const listener = addEventListener(eventName, handler, el);
+    addedListeners[eventName] = listener;
+  });
+  return addedListeners
+}
+function removeEventListeners(listeners, el) {
+  Object.entries(listeners).forEach(([eventName, handler]) => {
+    el.removeEventListener(eventName, handler);
+  });
+}
+
+function destroyDOM(vdom) {
+  const { type } = vdom;
+  switch (type) {
+    case DOM_TYPES.TEXT: {
+      removeTextNode(vdom);
+      break
+    }
+    case DOM_TYPES.ELEMENT: {
+      removeElementNode(vdom);
+      break
+    }
+    case DOM_TYPES.FRAGMENT: {
+      removeFragmentNodes(vdom);
+      break
+    }
+    default: {
+      throw new Error(`Can't destroy DOM of type: ${type}`)
+    }
+  }
+  delete vdom.el;
+}
+function removeTextNode(vdom) {
+  const { el } = vdom;
+  el.remove();
+}
+function removeElementNode(vdom) {
+  const { el, children, listeners } = vdom;
+  el.remove();
+  children.forEach(destroyDOM);
+  if (listeners) {
+    removeEventListeners(listeners, el);
+    delete vdom.listeners;
+  }
+}
+function removeFragmentNodes(vdom) {
+  const { children } = vdom;
+  children.forEach(destroyDOM);
+}
+
+class Dispatcher {
+  #subs = new Map()
+  #afterHandlers = []
+  dispatch(commandName, payload) {
+    if (this.#subs.has(commandName)) {
+      this.#subs.get(commandName).forEach((handler) => handler(payload));
+    } else {
+      console.warn(`No handlers for command: ${commandName}`);
+    }
+    this.#afterHandlers.forEach((handler) => handler());
+  }
+  subscribe(commandName, handler) {
+    if (!this.#subs.has(commandName)) {
+      this.#subs.set(commandName, []);
+    }
+    const handlers = this.#subs.get(commandName);
+    if (handlers.includes(handler)) {
+      return () => {}
+    }
+    handlers.push(handler);
+    return () => {
+      const idx = handlers.indexOf(handler);
+      handlers.splice(idx, 1);
+    }
+  }
+  afterEveryCommand(handler) {
+    this.#afterHandlers.push(handler);
+    return () => {
+      const idx = this.#afterHandlers.indexOf(handler);
+      this.#afterHandlers.splice(idx, 1);
+    }
+  }
 }
 
 function setAttributes(el, attrs) {
@@ -65,24 +162,6 @@ function setAttribute(el, name, value) {
 function removeAttribute(el, name) {
   el[name] = null;
   el.removeAttribute(name);
-}
-
-function addEventListener(eventName, handler, el) {
-  el.addEventListener(eventName, handler);
-  return handler
-}
-function addEventListeners(listeners = {}, el) {
-  const addedListeners = {};
-  Object.entries(listeners).forEach(([eventName, handler]) => {
-    const listener = addEventListener(eventName, handler, el);
-    addedListeners[eventName] = listener;
-  });
-  return addedListeners
-}
-function removeEventListeners(listeners, el) {
-  Object.entries(listeners).forEach(([eventName, handler]) => {
-    el.removeEventListener(eventName, handler);
-  });
 }
 
 function mountDOM(vdom, parentEl) {
@@ -129,60 +208,41 @@ function addProps(el, props, vdom) {
   setAttributes(el, attrs);
 }
 
-function destroyDOM(vdom) {
-  const { type } = vdom;
-  switch (type) {
-    case DOM_TYPES.TEXT: {
-      removeTextNode(vdom);
-      break
+function createApp({ state, view, reducers = {} }) {
+  let parentEl = null;
+  let vdom = null;
+  const dispatcher = new Dispatcher();
+  const subscriptions = [
+    dispatcher.afterEveryCommand(renderApp)
+  ];
+  function emit(eventName, payload) {
+    dispatcher.dispatch(eventName, payload);
+  }
+  for (const actionName in reducers) {
+    const reducer = reducers[actionName];
+    const subs = dispatcher.subscribe(actionName, (payload) => {
+      state = reducer(state, payload);
+    });
+    subscriptions.push(subs);
+  }
+  function renderApp() {
+    if (vdom) {
+      destroyDOM(vdom);
     }
-    case DOM_TYPES.ELEMENT: {
-      removeElementNode(vdom);
-      break
-    }
-    case DOM_TYPES.FRAGMENT: {
-      removeFragmentNodes(vdom);
-      break
-    }
-    default: {
-      throw new Error(`Can't destroy DOM of type: ${type}`)
+    vdom = view(state, emit);
+    mountDOM(vdom, parentEl);
+  }
+  return {
+    mount(_parentEl) {
+      parentEl = _parentEl;
+      renderApp();
+    },
+    unmount() {
+      destroyDOM(vdom);
+      vdom = null;
+      subscriptions.forEach((unsubscribe) => unsubscribe());
     }
   }
-  delete vdom.el;
-}
-function removeTextNode(vdom) {
-  const { el } = vdom;
-  el.remove();
-}
-function removeElementNode(vdom) {
-  const { el, children, listeners } = vdom;
-  el.remove();
-  children.forEach(destroyDOM);
-  if (listeners) {
-    removeEventListeners(listeners, el);
-    delete vdom.listeners;
-  }
-}
-function removeFragmentNodes(vdom) {
-  const { children } = vdom;
-  children.forEach(destroyDOM);
 }
 
-const vdom = h('main', {}, [
-  h('section', {}, [
-    h('h1', {}, ['My Blog']),
-    h('p', {}, ['Welcome to my Blog']),
-  ]),
-  h('section', {}, [
-    h('form', { class: 'login-form', action: 'login' }, [
-      h('input', { type: 'text', name: 'user' }),
-      h('input', { type: 'password', name: 'pass' }),
-      h('button', { on: { click: () => {} } }, ['Login'])
-    ])
-  ])
-]);
-console.log(vdom);
-mountDOM(vdom, document.body);
-setTimeout(() => {
-  destroyDOM(vdom);
-}, 10000);
+export { createApp, h, hFragment, hString };
