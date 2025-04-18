@@ -37,8 +37,9 @@ export function destroyDOM(vdom) {
   delete vdom.el
 }
 
-function removeTextNode() {
-  throw new Error('[removeTextNode] not implemented')
+function removeTextNode(vdom) {
+  const { el } = vdom
+  el.remove()
 }
 
 function removeElementNode() {
