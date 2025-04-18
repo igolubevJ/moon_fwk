@@ -17,7 +17,15 @@ export function setAttributes(el, attrs) {
 }
 
 function setClass(el, className) {
-  throw new Error('[setClass] not implemented')
+  el.className = ''                    // очищаем аттрибут class
+
+  if (typeof className === 'string') {
+    el.className = className           // аттрибут className в виде строки 
+  }
+
+  if (Array.isArray(className)) {
+    el.classList.add(...className)     // аттрибут class в виде массива
+  }
 }
 
 function setStyle(el, prop, value) {
