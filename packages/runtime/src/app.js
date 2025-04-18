@@ -12,6 +12,10 @@ export function createApp({ state, view, reducers = {} }) {
     dispatcher.afterEveryCommand(renderApp)
   ]
 
+  function emit(eventName, payload) {
+    dispatcher.dispatch(eventName, payload)
+  }
+
   for (const actionName in reducers) {
     const reducer = reducers[actionName]
 
@@ -28,7 +32,7 @@ export function createApp({ state, view, reducers = {} }) {
       destroyDOM(vdom)
     }
 
-    vdom = view(state)
+    vdom = view(state, emit)
     mountDOM(vdom, parentEl)  // монтируем новое представление
   }
 
