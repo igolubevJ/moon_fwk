@@ -28,14 +28,25 @@ function setClass(el, className) {
   }
 }
 
-function setStyle(el, prop, value) {
-  el.style[prop] = value
+function setStyle(el, name, value) {
+  el.style[name] = value
 }
 
-function removeStyle(el, prop) {
-  el.style[prop] = null
+function removeStyle(el, name) {
+  el.style[name] = null
 }
 
 function setAttribute(el, name, value) {
-  throw new Error('[setAttribute] not implemented')
+  if (value == null) {
+    removeAttribute(el, name)
+  } else if (name.startsWith('data-')) {
+    el.setAttribute(name, value)
+  } else {
+    el[name] = value
+  }
+}
+
+function removeAttribute(el, name) {
+  el[name] = null
+  el.removeAttribute(name)
 }
