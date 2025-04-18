@@ -1,5 +1,5 @@
 import { DOM_TYPES } from './h'
-
+import { removeEventListeners } from './events'
 
 /// Чтобы уничтожить DOM, связанный с виртуальным узлом,
 /// нужно учесть, какому типу узла он соответствует: 
@@ -42,8 +42,16 @@ function removeTextNode(vdom) {
   el.remove()
 }
 
-function removeElementNode() {
-  throw new Error('[removeElementNode] not implemented')
+function removeElementNode(vdom) {
+  const { el, children, listeners } = vdom
+
+  el.remove()
+  children.forEach(destroyDOM)
+
+  if (listeners) {
+    removeEventListeners(listeners, el)
+    delete vdom.listeners
+  }
 }
 
 function removeFragmentNodes() {
