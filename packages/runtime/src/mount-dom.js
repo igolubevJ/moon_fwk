@@ -1,4 +1,6 @@
 import { DOM_TYPES } from './h'
+import { setAttributes } from './attributes'
+import { addEventListeners } from './events'
 
 export function mountDOM(vdom, parentEl) {
   switch(vdom.type) {
@@ -49,8 +51,32 @@ function createFragmentNode(vdom, parentEl) {
   children.forEach((child) => mountDOM(child, parentEl)) // Присоединяет каждый дочерний узел к родительскому элементу
 }
 
+/// Для создания узлов элементов используется метод createElement().
+/// При вызове createElement() нужно передать имя тега. DOM API
+/// возвращает узел элемента, соответствующий этому тегу или HTMLUnknownElement
+/// 
+/// Чтобы создать соответствующий DOM элемент для виртуального узла:
+/// 1. Создайте узел элемента при помощи функции document.createElement()
+/// 2. Добавьте атрибуты и обработчик событий к узлу элемента, сохраняя 
+///    добавленные обработчики в новом свойстве виртуального узла с 
+///    именем listeners.
+/// 3. Сохраните ссылку на узел элемента в свойстве el виртуального узла.
+/// 4. Рекурсивно смонтируйте дочернии узлы в узле элемента.
+/// 5. Присоедините узел элемента к родительскому элементу.
 function createElementNode(vdom, parentEl) {
-  throw new Error('[createElementNode] not implemented')
+  const { tag, props, children } = vdom
+
+  const element = document.createElement(tag)  // Создание узла элемента
+  addProps(element, props, vdom)               // Добавление атрибута и обработчик событий
+  vdom.el = element
+
+  children.forEach((child) => mountDOM(child, element))
+  parentEl.append(element)
 }
 
+function addProps(el, props, vdom) {
+  const { on: events, ...attrs } = props          // Отделяет обработчик от аттрибутов
 
+  vdom.listeners = addEventListeners(events, el)  // Добавляет обработчик событий
+  setAttributes(el, attrs)                        // Задает атрибуты
+}
