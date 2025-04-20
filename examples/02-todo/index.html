@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo example</title>
+</head>
+<body>
+  <script type="module">
+    import { createApp, h, hString } from 'https://unpkg.com/moon_fwk@1.0.0'
+
+    const state = {
+      currentTodo: '',
+      edit: {
+        idx: null,
+        original: null,
+        edited: null,
+      },
+      TODO: ['Walk the dog', 'Water the plants']
+    }
+
+    console.log(state)
+
+  </script>
+</body>
+</html>
