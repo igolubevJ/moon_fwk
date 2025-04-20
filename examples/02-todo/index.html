@@ -19,7 +19,86 @@
       TODO: ['Walk the dog', 'Water the plants']
     }
 
-    console.log(state)
+    const reducers = {
+      
+      // Обновление текущей задачи.
+      // Пользователь вводит новый символ в поле, текущую задачу
+      // нужно обновить.
+      'update-current-todo': (state, currentTodo) => {
+        return {
+          ...state,
+          currentTodo,
+        }
+      },
+
+      // Добавление новой задачи.
+      // Пользователь щелкает на кнопке Add, чтобы добавить новую
+      // задачу в список.
+      'add-todo': (state) => {
+        return {
+          ...state,
+          currentTodo: '',
+          TODO: [...state.TODO, state.currentTodo],
+        }
+      },
+
+      // Начало редактирования задачи.
+      // Пользователь делает двойной щелчек на задаче, чтобы 
+      // начать ее редактировать.
+      'start-editing-todo': (state, idx) => {
+        return {
+          ...state,
+          edit: {
+            idx,
+            original: state.TODO[idx],
+            edited: state.TODO[idx],
+          }
+        }
+      },
+
+      // Редактирование задачи.
+      // Пользователь вводит новый символ в поле при редактировании
+      // задачи.
+      'edit-todo': (state, edited) => {
+        return {
+          ...state,
+          edit: {...state.edit, edited}
+        }
+      },
+
+      // Сохранение отредактированной задачи.
+      // Пользователь завершает редактирование задачи и сохраняет 
+      // изменения.
+      'save-edited-todo': (state) => {
+        const TODO = [...state.TODO]
+        TODO[state.edit.idx] = state.edit.edited
+
+        return {
+          ...state,
+          edit: {idx: null, original: null, edited: null},
+          TODO,
+        }
+      },
+
+      // Отмена редактирования задачи.
+      // Пользователь отменяет редактирование, изменения пропадают.
+      'cancel-editing-todo': (state) => {
+        return {
+          ...state,
+          edit: { idx: null, original: null, edited: null },
+        }
+      },
+
+      // Удаление задачи.
+      // Пользователь помечает задачу как завершенную, чтобы ее можно 
+      // было удалить из списка.
+      'remove-todo': (state, idx) => {
+        return {
+          ...state,
+          TODO: state.TODO.filter((_, i) => i !== idx),
+        }
+      },
+    }
 
   </script>
 </body>
