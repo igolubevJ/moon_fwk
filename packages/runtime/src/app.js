@@ -1,6 +1,7 @@
 import { destroyDOM } from './destroy-dom'
 import { Dispatcher } from './dispatcher'
 import { mountDOM } from './mount-dom'
+import { patchDOM } from './patch-dom'
 
 /// Функция которая создает объект приложения
 export function createApp({ state, view, reducers = {} }) {
@@ -26,20 +27,14 @@ export function createApp({ state, view, reducers = {} }) {
   }
 
   function renderApp() {
-    if (vdom) {
-      // Если предыдущее представление существует, 
-      // оно демонтируется.
-      destroyDOM(vdom)
-    }
-
-    vdom = view(state, emit)
-    mountDOM(vdom, parentEl)  // монтируем новое представление
+    const newVdom = view(state, emit)        // Вычисляем новый виртуальный DOM
+    vdom = patchDOM(vdom, newVdom, parentEl) // Обновляет DOM при изменении состояния
   }
 
   return {
     mount(_parentEl) {        // метод для монтирования приложения в DOM
-      parentEl = _parentEl
-      renderApp()
+      vdom = view(state, emit)
+      mountDOM(vdom, parentEl) // Монтирует DOM только один раз
     },
 
     unmount() {               // метод для демонтирования приложения из DOM
