@@ -7,7 +7,7 @@
 </head>
 <body>
   <script type="module">
-    import { createApp, h, hString } from 'https://unpkg.com/moon_fwk@1.0.0'
+    import { createApp, h, hString, hFragment } from 'https://unpkg.com/moon_fwk@1.0.0'
 
     const state = {
       currentTodo: '',
@@ -98,6 +98,24 @@
           TODO: state.TODO.filter((_, i) => i !== idx),
         }
       },
+    }
+
+    // Compnents --------------------------------------------------------
+
+    function App(state, emit) {
+      return hFragment([
+        h('h1', {}, ['My todo']),
+        CreateTodo(state, emit),
+        TodoList(state, emit),
+      ])
+    }
+
+    function CreateTodo({ currentTodo }, emit) {
+      throw new Error('[CreateTodo] not implemented')
+    }
+
+    function TodoList({ TODO, edit }, emit) {
+      throw new Error('[TodoList] not implemented')
     }
 
   </script>
